@@ -1,41 +1,34 @@
-require('dotenv').config();
-const express = require('express');
-const mongoose = require('mongoose');
-const cors = require('cors');
+const express = require("express");
+const mongoose = require("mongoose");
+const cors = require("cors");
+require("dotenv").config();
 
 const app = express();
 app.use(express.json());
 app.use(cors());
 
-mongoose.connect(process.env.MONGODB_URI, {
+// ✅ Connect to MongoDB
+mongoose
+  .connect(process.env.MONGODB_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
-}).then(() => console.log('MongoDB connected'))
-  .catch(err => console.log(err));
+  })
+  .then(() => console.log("✅ MongoDB connected"))
+  .catch((err) => console.error("❌ MongoDB connection error:", err));
 
-const NoteSchema = new mongoose.Schema({
-    title: String,
-    content: String,
-    createdAt: { type: Date, default: Date.now },
+// ✅ Simple Home Route
+app.get("/", (req, res) => {
+  res.send("🚀 API is running successfully!");
 });
 
-const Note = mongoose.model('Note', NoteSchema);
-
-app.get('/notes', async (req, res) => {
-    const notes = await Note.find();
-    res.json(notes);
+// ✅ Example Notes Route (Modify as Needed)
+app.get("/notes", async (req, res) => {
+  res.json({ message: "📝 Notes API is working!" });
 });
 
-app.post('/notes', async (req, res) => {
-    const { title, content } = req.body;
-    const newNote = new Note({ title, content });
-    await newNote.save();
-    res.json(newNote);
-});
+// ✅ Start the Server
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
 
-app.delete('/notes/:id', async (req, res) => {
-    await Note.findByIdAndDelete(req.params.id);
-    res.json({ message: 'Note deleted' });
-});
-
-app.listen(3000, () => console.log('Server running on port 3000'));
+// ✅ Export for Vercel
+module.exports = app;
